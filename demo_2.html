@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESG Navigator Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    .chat-container {
+      width: 480px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0px 4px 16px rgba(0,0,0,0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .chat-header {
+      background: #0f4c81;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-header img {
+      height: 40px;
+      border-radius: 6px;
+    }
+    .chat-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .intro-card {
+      background: #e6f2ff;
+      margin: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .intro-card span {
+      font-size: 20px;
+    }
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+    .bot, .user {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 75%;
+    }
+    .bot {
+      background: #e6f2ff;
+      align-self: flex-start;
+    }
+    .user {
+      background: #0f4c81;
+      color: white;
+      align-self: flex-end;
+    }
+    .button-panel {
+      display: flex;
+      flex-wrap: wrap;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background: #fafafa;
+      gap: 8px;
+      justify-content: center;
+    }
+    .button-panel button {
+      flex: 1 1 45%;
+      padding: 10px;
+      border: none;
+      background: #0f4c81;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .button-panel button:hover {
+      background: #083357;
+    }
+    .clear-btn {
+      background: #dc3545 !important;
+    }
+    .clear-btn:hover {
+      background: #a71d2a !important;
+    }
+    /* Floating Help Tooltip */
+    .help-tooltip {
+      position: absolute;
+      bottom: 70px;
+      right: 15px;
+      background: #0f4c81;
+      color: white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+    }
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      bottom: 110px;
+      right: 15px;
+      background: #fff;
+      color: #333;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 220px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+    }
+    .tooltip-text.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Header with logo and name -->
+    <div class="chat-header">
+      <img src="logo.jpg" alt="ESG Navigator Logo">
+      <h2>ESG Navigator</h2>
+    </div>
+
+    <!-- Tagline -->
+    <div style="text-align:center; font-size:13px; color:#ddd; background:#0f4c81; padding:4px;">
+      Navigate ESG risks with clarity and speed
+    </div>
+
+    <!-- Intro card -->
+    <div class="intro-card">
+      <span>🤖</span>
+      <div>This chatbot helps you quickly understand <b>supply chain risks, compliance impact, and control updates</b>. Just click a button to get instant insights — no typing needed!</div>
+    </div>
+
+    <!-- Problem & User -->
+    <div style="background:#fafafa; margin:10px; padding:10px; border-radius:8px; font-size:13px;">
+      <b>Problem:</b> Supply chain disruptions make ESG compliance harder.<br>
+      <b>User:</b> Sustainability officers & procurement managers.
+    </div>
+
+    <!-- Chat messages -->
+    <div class="chat-box" id="chat-box">
+      <div class="bot">Hello! 👋 I am ESG Navigator. Select a topic below to get started.</div>
+    </div>
+
+    <!-- Buttons for quick answers -->
+    <div class="button-panel">
+      <button onclick="showAnswer('risk')">📝 Supply Chain Risk</button>
+      <button onclick="showAnswer('compliance')">⚖️ Compliance Impact</button>
+      <button onclick="showAnswer('controls')">🛡️ Controls Update</button>
+      <button onclick="showAnswer('example')">🚨 Real-World Example</button>
+      <button onclick="showAnswer('actions')">📊 Recommended Actions</button>
+      <button onclick="showAnswer('india')">🌍 India Supply Plan</button>
+      <button class="clear-btn" onclick="clearChat()">🗑️ Clear Chat</button>
+    </div>
+
+    <!-- Agent Panel -->
+    <div style="text-align:center; margin:10px;">
+      <button onclick="toggleAgentPanel()" style="padding:8px 12px; background:#0f4c81; color:white; border:none; border-radius:6px; cursor:pointer;">
+        📋 View Plan
+      </button>
+    </div>
+    <div id="agent-panel" style="display:none; background:#eef6ff; margin:12px; padding:12px; border-radius:8px; font-size:13px;">
+      <b>3-Step Plan:</b><br>
+      1️⃣ Plan → Identify supplier risks<br>
+      2️⃣ Action → Apply traceability controls<br>
+      3️⃣ Result → Reduced disruptions & better compliance
+    </div>
+
+    <!-- CTA + Research -->
+    <div style="text-align:center; margin:15px;">
+      <button style="padding:10px 16px; background:#28a745; color:white; border:none; border-radius:6px; cursor:pointer;">
+        🚀 Start ESG Assessment
+      </button>
+      <div style="font-size:11px; color:#666; margin-top:6px;">
+        Source: World Economic Forum (2023). <a href="https://www.weforum.org/reports/" target="_blank">Global Supply Chain Report</a>
+      </div>
+    </div>
+
+    <!-- Floating Help Tooltip -->
+    <div class="help-tooltip" onclick="toggleHelp()">❓</div>
+    <div class="tooltip-text" id="tooltip">
+      👉 Tip: Click the buttons below the chat to see predefined insights. Each answer is hardcoded so you always get clear, consistent guidance.
+    </div>
+
+    <!-- Assumptions Box -->
+    <div style="background:#f8f9fa; border-top:1px solid #ddd; font-size:11px; padding:6px 10px; color:#444; border-radius:0 0 14px 14px;">
+      <b>Top 3 assumptions:</b> (1) Static demo data, (2) Hardcoded insights, (3) No live API.<br>
+      <i>Ethics:</i> Demo only—no real data stored; preferences/actions are mocked.
+    </div>
+  </div>
+
+  <script>
+    const responses = {
+      risk: "📝 The new incentives aim to reduce India’s reliance on China for rare-earth magnets. This creates opportunities for local production but increases short-term supply chain uncertainty for EV and renewable energy manufacturers.",
+      compliance: "⚖️ Companies must reassess supplier dependencies in Scope 3 emissions reporting. Regulators may also expect updated disclosures on sourcing risks and supply diversification strategies.",
+      controls: "🛡️ Key controls to update: (1) Supplier traceability declarations, (2) Supplier concentration KPIs, (3) Contingency clauses in procurement contracts for critical minerals.",
+      example: "🚨 Example: A leading EV manufacturer faced production delays due to magnet shortages. By diversifying suppliers and adopting traceability controls, they maintained compliance and reduced risks.",
+      actions: "📊 Recommended Actions: 1) Perform supplier risk scan within 30 days, 2) Onboard alternate suppliers within 90 days, 3) Update procurement contracts with incentive clauses.",
+      india: "🌍 India’s Supply Chain Plan: The government has launched incentives for local rare-earth magnet production. This aims to build domestic capacity, reduce import reliance, and strengthen long-term supply chain resilience."
+    };
+
+    function showAnswer(type) {
+      const chatBox = document.getElementById("chat-box");
+
+      // User-selected button message
+      const userDiv = document.createElement("div");
+      userDiv.className = "user";
+      userDiv.textContent = "Selected: " + type.replace(/^\w/, c => c.toUpperCase());
+      chatBox.appendChild(userDiv);
+
+      // Bot response
+      const botDiv = document.createElement("div");
+      botDiv.className = "bot";
+      botDiv.textContent = responses[type];
+      chatBox.appendChild(botDiv);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function clearChat() {
+      const chatBox = document.getElementById("chat-box");
+      chatBox.innerHTML = '<div class="bot">Chat cleared 🗑️. Select a topic below to start again!</div>';
+    }
+
+    function toggleHelp() {
+      const tooltip = document.getElementById("tooltip");
+      tooltip.classList.toggle("active");
+    }
+
+    function toggleAgentPanel() {
+      const panel = document.getElementById("agent-panel");
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+  </script>
+</body>
+</html>
